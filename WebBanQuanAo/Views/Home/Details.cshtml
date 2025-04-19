@@ -1,0 +1,270 @@
+﻿@model WebBanQuanAo.Models.Product
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<style>
+    .product-container {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        padding: 30px;
+    }
+
+    /* Gallery Styles */
+    .product-gallery {
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+    .product-image-main {
+        width: 100%;
+        height: 500px;
+        object-fit: cover;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        transition: transform 0.3s ease;
+    }
+
+        .product-image-main:hover {
+            transform: scale(1.02);
+        }
+
+    .product-gallery-thumbnails {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        padding: 10px 0;
+        scrollbar-width: none; /* Firefox */
+    }
+
+        .product-gallery-thumbnails::-webkit-scrollbar {
+            display: none; /* Chrome, Safari */
+        }
+
+    .product-thumbnail {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 5px;
+        cursor: pointer;
+        opacity: 0.7;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+
+        .product-thumbnail:hover {
+            opacity: 1;
+        }
+
+        .product-thumbnail.selected {
+            opacity: 1;
+            border-color: var(--primary-color);
+        }
+
+    /* Product Details Styles */
+    .product-details {
+        padding: 0 20px;
+    }
+
+        .product-details h2 {
+            font-size: 32px;
+            font-weight: 600;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+        }
+
+    .product-description {
+        color: #666;
+        line-height: 1.6;
+        margin-bottom: 25px;
+        font-size: 16px;
+    }
+
+    .product-price {
+        font-size: 28px;
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-bottom: 20px;
+    }
+
+    .product-category {
+        margin-bottom: 20px;
+        color: #666;
+    }
+
+        .product-category span {
+            background: #f8f9fa;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+    .product-rating {
+        margin-bottom: 25px;
+    }
+
+        .product-rating i {
+            color: #ffc107;
+            margin-right: 5px;
+            font-size: 18px;
+        }
+
+    /* Form Controls */
+    .quantity-control {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .quantity-label {
+        font-weight: 500;
+        color: var(--secondary-color);
+    }
+
+    .quantity-input {
+        width: 120px;
+        padding: 10px 15px;
+        border: 2px solid #eee;
+        border-radius: 5px;
+        font-size: 16px;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+        .quantity-input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+    .btn-add-to-cart {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 15px 40px;
+        border-radius: 5px;
+        font-size: 16px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+    }
+
+        .btn-add-to-cart:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .btn-add-to-cart i {
+            font-size: 20px;
+        }
+
+    /* Additional Info */
+    .product-info-section {
+        margin-top: 40px;
+        padding-top: 30px;
+        border-top: 1px solid #eee;
+    }
+
+    .info-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--secondary-color);
+        margin-bottom: 15px;
+    }
+
+    /* Responsive */
+ 
+</style>
+
+<div class="container my-5">
+    <div class="product-container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="product-gallery">
+                    <img src="@Model.imgurl" class="product-image-main" alt="@Model.Name" id="main-product-image">
+                    @if (Model.ListImg != null && Model.ListImg.Any())
+                    {
+                        <div class="product-gallery-thumbnails">
+                            <img src="@Model.imgurl" class="product-thumbnail selected" alt="@Model.Name" onclick="changeImage('@Model.imgurl')" />
+                            @foreach (var image in Model.ListImg)
+                            {
+                                <img src="@image" class="product-thumbnail" alt="Product Image" onclick="changeImage('@image')" />
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="product-details">
+                    <h2>@Model.Name</h2>
+                    <div class="product-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                        <span class="rating-count">(4.5/5)</span>
+                    </div>
+ <div class="product-price">
+                        @Model.Price.ToString("N0") VND
+                        </div>                    
+                        <p class="product-description">@Model.Description</p>
+                    <div class="product-category">
+                        <span>Danh mục: @Model.Category?.Name</span>
+                    </div>
+
+                    <form asp-action="AddToCart" asp-controller="Home" method="post">
+                        <input type="hidden" name="productId" value="@Model.ProductId" />
+                        <div class="quantity-control">
+                            <label for="quantity" class="quantity-label">Số lượng:</label>
+                            <input type="number" name="quantity" value="1" min="1" class="quantity-input" />
+                        </div>
+                        <button type="submit" class="btn-add-to-cart">
+                            <i class="fas fa-shopping-cart"></i>
+                            Thêm vào giỏ hàng
+                        </button>
+                    </form>
+
+                    <div class="product-info-section">
+                        <h3 class="info-title">Thông tin sản phẩm</h3>
+                        <ul class="info-list">
+                            <li>Chất liệu cao cấp</li>
+                            <li>Thiết kế hiện đại</li>
+                            <li>Đổi trả trong 30 ngày</li>
+                            <li>Bảo hành 12 tháng</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function changeImage(imageUrl) {
+        const mainImage = document.getElementById('main-product-image');
+        const thumbnails = document.querySelectorAll('.product-thumbnail');
+
+        // Thay đổi hình ảnh chính với animation
+        mainImage.style.opacity = '0';
+        setTimeout(() => {
+            mainImage.src = imageUrl;
+            mainImage.style.opacity = '1';
+        }, 200);
+
+        // Cập nhật trạng thái thumbnails
+        thumbnails.forEach(thumb => {
+            if (thumb.src === imageUrl) {
+                thumb.classList.add('selected');
+            } else {
+                thumb.classList.remove('selected');
+            }
+        });
+    }
+
+    // Thêm animation cho hình ảnh chính
+    document.getElementById('main-product-image').style.transition = 'opacity 0.2s ease';
+</script>
